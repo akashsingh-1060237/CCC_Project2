@@ -1,0 +1,19 @@
+---
+- name: Set facts
+  set_fact:
+    worker_token: "{{ hostvars[groups['managers'][0]]['worker_token'] }}"
+    manager_addrs: "{{ hostvars[groups['managers'][0]]['manager_addrs'] }}"
+
+# leave the old swarm
+- name: Leave swarm for a node
+  become: yes
+  docker_swarm:
+    state: absent
+
+- name: Add worker nodes
+  become: yes
+  docker_swarm:
+    state: join
+    advertise_addr: '{{ ansible_default_ipv4.address }}'
+    join_token: '{{ worker_token }}'
+    remote_addrs: ['{{ manager_addrs }}']

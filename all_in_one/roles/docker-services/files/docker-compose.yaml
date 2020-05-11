@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  nginx-web:
+    image: nginx
+    restart: always
+    volumes:
+      - nginx-data:/usr/share/nginx/html/
+    ports:
+      - 8080:80
+    deploy:
+      mode: replicated
+      replicas: 2
+
+volumes:
+  nginx-data:
+
+
