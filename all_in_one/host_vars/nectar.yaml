@@ -38,6 +38,12 @@ security_groups:
     port_range_min: 8080
     port_range_max: 8080
     remote_ip_prefix: 0.0.0.0/0
+  - name: demo_flask
+    description: "Security group for Flask server"
+    protocol: tcp
+    port_range_min: 5000
+    port_range_max: 5000
+    remote_ip_prefix: 0.0.0.0/0
   - name: demo_couchDB_1
     description: "Security group for couchDB cluster"
     protocol: tcp

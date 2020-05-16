@@ -5,7 +5,7 @@
 
 - name: Run couchdb
   become: yes
-  shell: 'docker run --name couchdb{{ ansible_default_ipv4.address }} -it -p 9100-9200:9100-9200 -p 5984:5984 -p 4369:4369 --env COUCHDB_USER={{ user }} --env COUCHDB_PASSWORD={{ password }} --env NOOENAME="couchdb@{{ ansible_default_ipv4.address }}" --env COUCHDB_SECRET={{COUCHDB_SECRET}} --env ERL_FLAGS="-setcookie {{COUCHDB_SECRET}} -name couchdb@{{ ansible_default_ipv4.address }}" -d {{ couchdb }}:{{ couchdb_version }}'
+  shell: 'docker run --name couchdb{{ ansible_default_ipv4.address }} -v couchdb:/opt/couchdb/data -it -p 9100-9200:9100-9200 -p 5984:5984 -p 4369:4369 --env COUCHDB_USER={{ user }} --env COUCHDB_PASSWORD={{ password }} --env NOOENAME="couchdb@{{ ansible_default_ipv4.address }}" --env COUCHDB_SECRET={{COUCHDB_SECRET}} --env ERL_FLAGS="-setcookie {{COUCHDB_SECRET}} -name couchdb@{{ ansible_default_ipv4.address }}" -d {{ couchdb }}:{{ couchdb_version }}'
 
 - pause:
     seconds: 5

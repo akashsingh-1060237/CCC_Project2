@@ -40,3 +40,8 @@
   become: yes
   pip:
     name: jsondiff
+
+- name: Install Flask
+  become: yes
+  pip:
+    name: Flask

@@ -1,10 +1,4 @@
 ---
-- name: Copying file to remote
-  become: yes
-  copy:
-    src: "./files/docker-compose.yaml"
-    dest: "/docker"
-
 - name: Deploy stack from a compose file
   become: yes
   docker_stack:
@@ -16,3 +10,7 @@
 
 - debug:
     msg: '{{ output }}'
+
+- pause:
+    prompt: "Enter a secret"
+    echo: no

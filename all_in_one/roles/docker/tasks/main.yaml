@@ -84,16 +84,16 @@
   become: yes
   reboot:
     reboot_timeout: 3000
-
-# build Nginx image
-- name: Build Docker image from Dockerfile
-  become: yes
-  docker_image:
-    name: web-server
-    build:
-      pull: yes
-      path: "/docker"
-    source: build
+#
+## build Nginx image
+#- name: Build Docker image from Dockerfile
+#  become: yes
+#  docker_image:
+#    name: web-server
+#    build:
+#      pull: yes
+#      path: "/docker"
+#    source: build
 
 - name: Get running containers
   become: yes
@@ -113,3 +113,25 @@
   become: yes
   docker_prune:
     containers: yes
+
+# copy file and build flask-nginx server image
+- name: Copying file to remote
+  become: yes
+  copy:
+    src: "./files/docker-compose.yaml"
+    dest: "/docker"
+
+- name: Copy web configuration files
+  become: yes
+  copy:
+    src: './files/web'
+    dest: '/docker'
+
+- name: Build web image from Dockerfile
+  become: yes
+  docker_image:
+    name: web-server
+    build:
+      pull: yes
+      path: "/docker/web"
+    source: build

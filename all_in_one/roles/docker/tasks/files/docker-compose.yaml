@@ -1,18 +1,18 @@
 version: '3.7'
 
 services:
-  nginx-web:
-    image: nginx
+  flask:
+    image: web-server
+    container_name: web
     restart: always
     volumes:
-      - nginx-data:/usr/share/nginx/html/
+      - web-data:/app
     ports:
-      - 8080:80
+      - 80:80
     deploy:
       mode: replicated
       replicas: 2
 
 volumes:
-  nginx-data:
-
+  web-data:
 
