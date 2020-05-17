@@ -25,12 +25,3 @@
       pull: yes
       path: "/docker/react/{{ APP_NAME }}"
     source: build
-
-- name: Deploy react from a compose file
-  become: yes
-  docker_stack:
-    state: present
-    name: myreact
-    compose:
-      - "/docker/react/docker-compose.yaml"
-

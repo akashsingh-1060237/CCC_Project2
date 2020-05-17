@@ -35,13 +35,19 @@
   roles:
     - role: docker-services
 
-# Download react cli
+# Download react
 - hosts: COMP90024
   vars_files:
     - host_vars/react.yaml
   gather_facts: true
   roles:
     - role: react-setup
+
+# react manager start react services
+- hosts: managers
+  gather_facts: true
+  roles:
+    - role: react-service
 
 # Worker nodes start
 - hosts: workers
