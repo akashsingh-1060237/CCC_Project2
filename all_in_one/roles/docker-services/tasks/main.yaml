@@ -10,7 +10,3 @@
 
 - debug:
     msg: '{{ output }}'
-
-- pause:
-    prompt: "Enter a secret"
-    echo: no

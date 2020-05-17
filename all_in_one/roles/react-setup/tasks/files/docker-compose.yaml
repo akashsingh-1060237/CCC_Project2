@@ -1,0 +1,15 @@
+version: '3'
+services:
+  react:
+    image: myreact:latest
+    container_name: react
+    restart: always
+    volumes:
+      - react-data:/app
+    ports:
+      - 3000:3000
+    deploy:
+      mode: replicated
+      replicas: 2
+volumes:
+  react-data:

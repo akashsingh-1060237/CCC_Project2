@@ -29,11 +29,19 @@
   roles:
     - role: docker-swarm-workers
 
-# Create nginx service
+# Create web service
 - hosts: managers
   gather_facts: true
   roles:
     - role: docker-services
+
+# Download react cli
+- hosts: COMP90024
+  vars_files:
+    - host_vars/react.yaml
+  gather_facts: true
+  roles:
+    - role: react-setup
 
 # Worker nodes start
 - hosts: workers

@@ -62,12 +62,12 @@ security_groups:
     port_range_min: 9100
     port_range_max: 9200
     remote_ip_prefix: 0.0.0.0/0
-#  - name: demo_couchDB_4
-#    description: "Security group for couchDB cluster"
-#    protocol: tcp
-#    port_range_min: 35984
-#    port_range_max: 35984
-#    remote_ip_prefix: 0.0.0.0/0
+  - name: demo_react
+    description: "Security group for react"
+    protocol: tcp
+    port_range_min: 3000
+    port_range_max: 3000
+    remote_ip_prefix: 0.0.0.0/0
 
 # Instance
 instances:

@@ -41,7 +41,19 @@
   pip:
     name: jsondiff
 
-- name: Install Flask
+- name: Install yarn
   become: yes
-  pip:
-    name: Flask
+  shell: 'curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -'
+
+- name: Install yarn
+  become: yes
+  shell: 'echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list'
+
+- name: Install yarn using apt
+  tags: always
+  become: yes
+  apt:
+    name: ['yarn']
+    state: latest
+    install_recommends: no
+    update_cache: yes
