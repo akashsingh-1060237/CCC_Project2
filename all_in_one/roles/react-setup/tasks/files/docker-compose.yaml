@@ -2,7 +2,6 @@ version: '3'
 services:
   react:
     image: myreact:latest
-    container_name: react
     restart: always
     volumes:
       - react-data:/app
