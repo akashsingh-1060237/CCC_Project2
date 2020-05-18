@@ -3,7 +3,7 @@
   become: yes
   copy:
     src: './files/docker-compose.yaml'
-    dest: '/docker/react'
+    dest: '/docker/react/'
 
 - name: Create react app
   become: yes
