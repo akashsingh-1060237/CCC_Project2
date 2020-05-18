@@ -47,7 +47,7 @@
 - hosts: managers
   gather_facts: true
   roles:
-    - role: react-service
+    - role: react-frontend
 
 # Worker nodes start
 - hosts: workers
