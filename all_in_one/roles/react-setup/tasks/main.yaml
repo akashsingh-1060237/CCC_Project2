@@ -1,4 +1,10 @@
 ---
+- name: Copy compose file into react folder
+  become: yes
+  copy:
+    src: './files/docker-compose.yaml'
+    dest: '/docker/react'
+
 - name: Create react app
   become: yes
   args:
@@ -10,12 +16,6 @@
   copy:
     src: './files/Dockerfile'
     dest: '/docker/react/{{ APP_NAME }}'
-
-- name: Copy compose file into react folder
-  become: yes
-  copy:
-    src: './files/docker-compose.yaml'
-    dest: '/docker/react'
 
 - name: Build react image from Dockerfile
   become: yes
