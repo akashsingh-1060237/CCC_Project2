@@ -1,0 +1,11 @@
+[Unit]
+Description=Harvest Service
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /docker/harvest/harvest.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
