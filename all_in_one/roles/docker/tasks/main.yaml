@@ -135,3 +135,6 @@
       pull: yes
       path: "/docker/web"
     source: build
+  environment:
+    http_proxy: http://wwwproxy.unimelb.edu.au:8000/
+    https_proxy: http://wwwproxy.unimelb.edu.au:8000/
