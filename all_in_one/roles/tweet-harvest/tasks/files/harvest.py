@@ -19,6 +19,8 @@ from tweepy import Stream
 import re
 import time
 import json
+import os
+os.environ["HTTPS_PROXY"] = "http://wwwproxy.unimelb.edu.au:8000"
 start_time=time.time()
 access_token = "1251831797089886210-KawGdu5lvWNBTJpQE1sjjML3L2V9Nn"
 access_token_secret ="tFhySpFIU23zzwGs85NGWNabCLA37kiwPb0oBYtUmWXke"
