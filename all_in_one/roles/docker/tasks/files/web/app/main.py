@@ -4,14 +4,14 @@ import os
 os.environ["HTTPS_PROXY"] = "http://wwwproxy.unimelb.edu.au:8000"
 app = Flask(__name__)
 urlfrmat='http://ip/dt'
-url_corona='http://user:pass@172.26.133.107:5984/final_tweet_harvester2/_design/final/_view/corona?reduce=true&group=true'
-url_economy='http://user:pass@172.26.133.107:5984/final_tweet_harvester2/_design/final/_view/economy?reduce=true&group=true'
-url_employment='http://user:pass@172.26.133.107:5984/final_tweet_harvester2/_design/final/_view/employment?reduce=true&group=true'
-url_hash_covid='http://user:pass@172.26.133.107:5984/final_tweet_harvester2/_design/final/_view/hashtag_covid?reduce=true&group=true'
-url_hash_economy='http://user:pass@172.26.133.107:5984/final_tweet_harvester2/_design/final/_view/hashtag_economy?reduce=true&group=true'
-url_hash_employment='http://user:pass@172.26.133.107:5984/final_tweet_harvester2/_design/final/_view/hashtag_employment?reduce=true&group=true'
-url_location='http://user:pass@172.26.133.107:5984/final_tweet_harvester2/_design/final/_view/location?reduce=true&group=true'
-url_precise='http://user:pass@172.26.133.107:5984/final_tweet_harvester2/_design/final/_view/precise?reduce=true&group=true'
+url_corona='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/corona?reduce=true&group=true'
+url_economy='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/economy?reduce=true&group=true'
+url_employment='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/employment?reduce=true&group=true'
+url_hash_covid='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/hashtag_covid?reduce=true&group=true'
+url_hash_economy='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/hashtag_economy?reduce=true&group=true'
+url_hash_employment='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/hashtag_employment?reduce=true&group=true'
+url_location='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/location?reduce=true&group=true'
+url_precise='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/precise?reduce=true&group=true'
 rsp_corona=requests.get(url_corona)
 rsp_economy=requests.get(url_economy)
 rsp_employment=requests.get(url_employment)
