@@ -29,12 +29,6 @@
   roles:
     - role: docker-swarm-workers
 
-# Create web service
-- hosts: managers
-  gather_facts: true
-  roles:
-    - role: docker-services
-
 # Download react
 - hosts: COMP90024
   vars_files:
@@ -64,6 +58,18 @@
   gather_facts: true
   roles:
     - role: couchdb
+
+# create db views
+- hosts: COMP90024
+  gather_facts: true
+  roles:
+    - role: setup-views
+
+# Create web service
+- hosts: managers
+  gather_facts: true
+  roles:
+    - role: docker-services
 
 - hosts: COMP90024
   gather_facts: true

@@ -129,12 +129,15 @@
 
 - name: Build web image from Dockerfile
   become: yes
-  docker_image:
-    name: web-server
-    build:
-      pull: yes
-      path: "/docker/web"
-    source: build
-  environment:
-    http_proxy: http://wwwproxy.unimelb.edu.au:8000/
-    https_proxy: http://wwwproxy.unimelb.edu.au:8000/
+  command: 'docker build -t web-server --build-arg http_proxy=http://wwwproxy.unimelb.edu.au:8000/ --build-arg https_proxy=http://wwwproxy.unimelb.edu.au:8000/ .'
+  args:
+    chdir: '/docker/web'
+#  docker_image:
+#    name: web-server
+#    build:
+#      pull: yes
+#      path: "/docker/web"
+#    source: build
+#  environment:
+#    http_proxy: http://wwwproxy.unimelb.edu.au:8000/
+#    https_proxy: http://wwwproxy.unimelb.edu.au:8000/

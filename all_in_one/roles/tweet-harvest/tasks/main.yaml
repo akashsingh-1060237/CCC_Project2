@@ -13,8 +13,18 @@
 
 - name: Start the script as an ubuntu service
   become: yes
-  command: "systemctl daemon-reload
-            systemctl enable harvest.service
-            systemctl start harvest.service"
+  command: "systemctl daemon-reload"
+  args:
+    chdir: '/lib/systemd/system/'
 
+- name: Start the script as an ubuntu service
+  become: yes
+  command: "systemctl enable harvest.service"
+  args:
+    chdir: '/lib/systemd/system/'
 
+- name: Start the script as an ubuntu service
+  become: yes
+  command: "systemctl start harvest.service"
+  args:
+    chdir: '/lib/systemd/system/'

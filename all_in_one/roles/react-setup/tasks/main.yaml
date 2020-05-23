@@ -5,6 +5,21 @@
     src: './files/docker-compose.yaml'
     dest: '/docker/react/'
 
+# collect stats about the dir
+- name: check directory exists
+  become: yes
+  stat:
+    path: '/docker/react/my-app'
+  register: dir_to_delete
+
+# delete directory if condition is true
+- name: purge my-app
+  become: yes
+  file:
+    state: absent
+    path: '/docker/react/my-app'
+  when: dir_to_delete.stat.exists and dir_to_delete.stat.isdir
+
 - name: Create react app
   become: yes
   args:

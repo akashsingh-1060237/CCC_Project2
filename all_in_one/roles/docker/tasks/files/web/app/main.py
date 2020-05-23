@@ -1,82 +1,17 @@
 from flask import Flask, jsonify, abort, make_response
 import requests
-import os
-os.environ["HTTPS_PROXY"] = "http://wwwproxy.unimelb.edu.au:8000"
+# import os
+# os.environ["HTTPS_PROXY"] = "http://wwwproxy.unimelb.edu.au:8000"
 app = Flask(__name__)
 urlfrmat='http://ip/dt'
-url_corona='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/corona?reduce=true&group=true'
-url_economy='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/economy?reduce=true&group=true'
-url_employment='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/employment?reduce=true&group=true'
-url_hash_covid='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/hashtag_covid?reduce=true&group=true'
-url_hash_economy='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/hashtag_economy?reduce=true&group=true'
-url_hash_employment='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/hashtag_employment?reduce=true&group=true'
-url_location='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/location?reduce=true&group=true'
-url_precise='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final/_view/precise?reduce=true&group=true'
-rsp_corona=requests.get(url_corona)
-rsp_economy=requests.get(url_economy)
-rsp_employment=requests.get(url_employment)
-rsp_hash_covid=requests.get(url_hash_covid)
-rsp_hash_economy=requests.get(url_hash_economy)
-rsp_hash_employment=requests.get(url_hash_employment)
-rsp_location=requests.get(url_location)
-rsp_precise=requests.get(url_precise)
-
-print(rsp_corona.status_code)
-print(rsp_economy.status_code)
-print(rsp_employment.status_code)
-print(rsp_hash_covid.status_code)
-print(rsp_hash_economy.status_code)
-print(rsp_hash_employment.status_code)
-print(rsp_location.status_code)
-print(rsp_precise.status_code)
-
-content_corona = {}
-content_economy = {}
-content_employment = {}
-content_hash_covid = {}
-content_hash_economy = {}
-content_hash_employment = {}
-content_location = {}
-content_precise = {}
-try:
-    content_corona=rsp_corona.json()
-except:
-    pass
-
-try:
-    content_economy=rsp_economy.json()
-except:
-    pass
-
-try:
-    content_employment=rsp_employment.json()
-except:
-    pass
-
-try:
-    content_hash_covid=rsp_hash_covid.json()
-except:
-    pass
-
-try:
-    content_hash_economy=rsp_hash_economy.json()
-except:
-    pass
-
-try:
-    content_hash_employment=rsp_hash_employment.json()
-except:
-    pass
-
-try:
-    content_location=rsp_location.json()
-except:
-    pass
-
-try:
-    content_precise=rsp_precise.json()
-except:
-    pass
+url_corona='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/corona?reduce=true&group=true'
+url_economy='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/economy?reduce=true&group=true'
+url_employment='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/employment?reduce=true&group=true'
+url_hash_covid='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/hashtag_covid?reduce=true&group=true'
+url_hash_economy='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/hashtag_economy?reduce=true&group=true'
+url_hash_employment='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/hashtag_employment?reduce=true&group=true'
+url_location='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/location?reduce=true&group=true'
+url_precise='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/precise?reduce=true&group=true'
 
 @app.errorhandler(400)
 def not_found(error):
@@ -130,43 +65,35 @@ def get_loc_precise(data):
 
 @app.route('/fetch/api/v1.0/tasks/corona', methods = ['GET'])
 def get_tasks1():
-    return jsonify(list(get_info(content_corona)))
+    return jsonify(list(get_info(requests.get(url_corona).json())))
 
 @app.route('/fetch/api/v1.0/tasks/economy', methods = ['GET'])
 def get_tasks2():
-    return jsonify(list(get_info(content_economy)))
+    return jsonify(list(get_info(requests.get(url_economy).json())))
 
 @app.route('/fetch/api/v1.0/tasks/employment', methods = ['GET'])
 def get_tasks3():
-    return jsonify(list(get_info(content_employment)))
+    return jsonify(list(get_info(requests.get(url_employment).json())))
 
 @app.route('/fetch/api/v1.0/tasks/hash_covid', methods = ['GET'])
 def get_tasks4():
-    return jsonify(list(get_info(content_hash_covid)))
+    return jsonify(list(get_info(requests.get(url_hash_covid).json())))
 
 @app.route('/fetch/api/v1.0/tasks/hash_economy', methods = ['GET'])
 def get_tasks5():
-    return jsonify(list(get_info(content_hash_economy)))
+    return jsonify(list(get_info(requests.get(url_hash_economy).json())))
 
 @app.route('/fetch/api/v1.0/tasks/hash_employment', methods = ['GET'])
 def get_tasks6():
-     return jsonify(list(get_info(content_hash_employment)))
+     return jsonify(list(get_info(requests.get(url_hash_employment).json())))
 
 @app.route('/fetch/api/v1.0/tasks/location', methods = ['GET'])
 def get_tasks7():
-    return jsonify(list(get_loc(content_location)))
+    return jsonify(list(get_loc(requests.get(url_location).json())))
 
 @app.route('/fetch/api/v1.0/tasks/precise', methods = ['GET'])
 def get_tasks8():
-    return jsonify(list(get_loc_precise(content_precise)))
-
-
-@app.route('/fetch/api/v1.0/tasks/<int:task_id>', methods = ['GET'])
-def get_task(task_id):
-    task = list(filter(lambda t: t['id'] == task_id, tasks))
-    if len(task) == 0:
-        abort(404)
-    return jsonify( { 'task': make_public_task(task[0]) } )
+    return jsonify(list(get_loc_precise(requests.get(url_precise).json())))
 
 @app.route("/")
 def hello():

@@ -12,6 +12,13 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+    networks:
+      - 'outside'
+
+networks:
+  outside:
+    external:
+      name: 'host'
 
 volumes:
   web-data:
