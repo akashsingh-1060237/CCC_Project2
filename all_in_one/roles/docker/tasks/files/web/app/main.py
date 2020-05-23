@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, abort, make_response
 import requests
-# import os
+import os
 # os.environ["HTTPS_PROXY"] = "http://wwwproxy.unimelb.edu.au:8000"
-app = Flask(__name__)
+# app = Flask(__name__)
 urlfrmat='http://ip/dt'
 url_corona='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/corona?reduce=true&group=true'
 url_economy='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/economy?reduce=true&group=true'
