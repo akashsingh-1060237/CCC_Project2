@@ -4,13 +4,13 @@ availability_zone: melbourne-qh2-uom
 # Volume
 volumes:
   - vol_name: demo-vol-1-1
-    vol_size: 10
+    vol_size: 30
   - vol_name: demo-vol-1-2
-    vol_size: 10
+    vol_size: 30
   - vol_name: demo-vol-2-1
-    vol_size: 10
+    vol_size: 30
   - vol_name: demo-vol-2-2
-    vol_size: 10
+    vol_size: 30
 
 # Security group
 security_groups:
