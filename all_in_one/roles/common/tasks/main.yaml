@@ -57,3 +57,25 @@
     state: latest
     install_recommends: no
     update_cache: yes
+
+# install modules for harvest script
+- name: Install wheel for python
+  become: yes
+  pip:
+    name: wheel
+
+- name: Install requests for python
+  become: yes
+  pip:
+    name: requests
+
+- name: Install tweepy for python
+  become: yes
+  pip:
+    name: tweepy
+
+- name: Install couchdb for python
+  become: yes
+  pip:
+    name: CouchDB
+

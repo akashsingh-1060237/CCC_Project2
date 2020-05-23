@@ -16,6 +16,7 @@ import tweepy
 import couchdb
 from tweepy import StreamListener
 from tweepy import Stream
+import requests
 import re
 import time
 import json
@@ -27,7 +28,7 @@ access_token_secret ="tFhySpFIU23zzwGs85NGWNabCLA37kiwPb0oBYtUmWXke"
 consumer_key = "3CwCe94hzHkFa2Ydd5Bp76Cxr"
 consumer_secret = "uveX5gXCJgkZFqrUY0KZHlfovdN8O6305XaH4H03drUv4Qjk1l"
 tweet_tracker=0#keeps track of tweets collected
-tweet_cutoffs=80000#number of live tweets from australia to collect
+tweet_cutoffs=3000#number of live tweets from australia to collect
 interested_text=['covid19','coronavirus','covid-19','economy','employment','income','covid','pandemic','outbreak','social distancing','community spread','self-isolation','quarantine','selfquarantine','self-quarantine','flatten the curve','economycrisis','jobloss','wage','wageloss','socialdistancing','aid','financialaid','financial aid','governmentsupport','govtsupport','economic slowdown','economicslowdown','slowdown','unemployment','debt','inflation','house prices','gdp','deflation','relief','jobkeeper','job keeper','subsidy','wages','wage subsidy','centrelink','employer','employee','employed','jobseeker','package','stimulus package','stimulus','stocks','budget','rent','rental','speculation','reccession','tax','taxes','emi','bailout','work hours','pension','self-employed','working hours','minimum wage','unemployment benefits','tution fee','tutionfee','accommodation','housing','unemployed','lockdown','lock down']#the terms we are interestedin, all tweets with atleast one of these terms in the tweet text,hashtag text would be considered
 user_ids=[]#list of user ids of tweets collected via streaming
 tweet_ids=[]#list of ids of tweet ids which are relevant or to be more specific the tweets which contain atleast one of the above mentioned terms
@@ -40,6 +41,54 @@ if couch.__contains__(db_name)==False:#if there is no existing database with sam
     db=couch.create(db_name)
 else:#if there is a existing database use it
     db=couch[db_name]
+# set up views
+payload={
+  "id": "_design/final",
+  "views": {
+    "economy": {
+      "reduce": "_count",
+      "map": "function (doc) {\n  var tweetext=doc.text\n  var corterms=['economy','economycrisis','aid','financialaid','financial aid','governmentsupport','govtsupport','economic slowdown','economicslowdown','slowdown','debt','inflation','house prices','gdp','deflation','relief','package','stimulus package','stimulus','stocks','budget','recession','tax','emi','bailout']\n  var ltweetext=tweetext.toLowerCase()\n  var results=corterms.map(checkterm)\n  function checkterm(value,index,array){\n    var r = ltweetext.search(value)\n    return r\n  }\n  var reslength=results.length\n  for(i=0;i<reslength;i++){\n    if (results[i]!=-1){\n      emit({'term':'economy','location':doc.place.name},1);\n      break\n       }\n      \n    }\n  }\n  \n  \n  \n\n  \n  \n  \n  \n  \n"
+    },
+    "corona": {
+      "reduce": "_count",
+      "map": "function (doc) {\n  var tweetext=doc.text\n  var corterms=['covid19','coronavirus','covid-19','covid','pandemic','outbreak','socialdistancing','social distancing','community spread','self-isolation','quarantine','selfquarantine','self-quarantine','flatten the curve','lockdown','lock down']\n  var ltweetext=tweetext.toLowerCase()\n  var results=corterms.map(checkterm)\n  function checkterm(value,index,array){\n    var r = ltweetext.search(value)\n    return r\n  }\n  reslength=results.length\n  for(i=0;i<reslength;i++){\n    if (results[i]!=-1){\n      emit({'term':'covid','location':doc.place.name},1);\n      break\n    }\n  }\n  \n  }\n  \n"
+    },
+    "employment": {
+      "reduce": "_count",
+      "map": "function (doc) {\n  var tweetext=doc.text\n  var corterms=['employment','income','unemployment','jobloss','wage','wageloss','jobkeeper','job keeper','subsidy','wages','wage subsidy','centrelink','employer','employee','jobseeker','employed','rent','rental','work hours','pension','self-employed','working hours','minimum wage','unemployment benefits','housing','unemployed']\n  var ltweetext=tweetext.toLowerCase()\n  var results=corterms.map(checkterm)\n  function checkterm(value,index,array){\n    var r = ltweetext.search(value)\n    return r\n  }\n  reslength=results.length\n  for(i=0;i<reslength;i++){\n    if (results[i]!=-1){\n      emit({'term':'employment','location':doc.place.name},1);\n      break\n    }\n  }\n  \n  }\n  \n"
+    },
+    "location": {
+      "reduce": "_sum",
+      "map": "function (doc) {\n  emit({'location name':doc.place.name,'location coordinates':doc.place.bounding_box.coordinates}, 1);\n}"
+    },
+    "hashtag_covid": {
+      "reduce": "_count",
+      "map": "function (doc) {\n  var hashtaginfo=doc.entities.hashtags\n  var hashtaglength=hashtaginfo.length\n  var hasht=[]\n  var covidterms=['covid19','coronavirus','covid-19','covid','pandemic','outbreak','socialdistancing','social distancing','community spread','self-isolation','quarantine','selfquarantine','self-quarantine','flatten the curve','lockdown','lock down']\n  if (hashtaglength>0){\n    for(i=0;i<hashtaglength;i++){\n      var hashtagtext=hashtaginfo[i].text\n      var lhashtagtext=hashtagtext.toLowerCase()\n      hasht.push(lhashtagtext)\n    }\n    \n  }\n  var hatext=hasht.join(',')\n  var covidhashresults=covidterms.map(checkhashtagcovid)\n  function checkhashtagcovid(value,index,array){\n    re=hatext.search(value)\n    return re\n  }\n  var covidhashlen=covidhashresults.length\n  if (covidhashlen>0){\n    for(i=0;i<covidhashlen;i++){\n      if (covidhashresults[i]!=-1){\n     emit({'term':'covid','location':doc.place.name}, 1);\n     break\n    }\n    \n  }\n  \n  }\n \n}"
+    },
+    "hashtag_economy": {
+      "reduce": "_count",
+      "map": "function (doc) {\n  var hashtaginfo=doc.entities.hashtags\n  var hashtaglength=hashtaginfo.length\n  var hasht=[]\n  var ecoterms=['economy','economycrisis','aid','financialaid','financial aid','governmentsupport','govtsupport','economic slowdown','economicslowdown','slowdown','debt','inflation','house prices','gdp','deflation','relief','package','stimulus package','stimulus','stocks','budget','recession','tax','emi','bailout']\n  if (hashtaglength>0){\n    for(i=0;i<hashtaglength;i++){\n      var hashtagtext=hashtaginfo[i].text\n      var lhashtagtext=hashtagtext.toLowerCase()\n      hasht.push(lhashtagtext)\n    }\n    \n  }\n  var hatext=hasht.join(',')\n  var ecohashresults=ecoterms.map(checkhashtageco)\n  function checkhashtageco(value,index,array){\n    re=hatext.search(value)\n    return re\n  }\n  var ecohashlen=ecohashresults.length\n  if (ecohashlen>0){\n    for(i=0;i<ecohashlen;i++){\n      if (ecohashresults[i]!=-1){\n     emit({'term':'economy','location':doc.place.name}, 1);\n     break\n    }\n    \n  }\n  \n  }\n\n \n}"
+    },
+    "hashtag_employment": {
+      "reduce": "_count",
+      "map": "function (doc) {\n  var hashtaginfo=doc.entities.hashtags\n  var hashtaglength=hashtaginfo.length\n  var hasht=[]\n  var employterms=['employment','income','unemployment','jobloss','wage','wageloss','jobkeeper','job keeper','subsidy','wages','wage subsidy','centrelink','employer','employee','jobseeker','employed','rent','rental','work hours','pension','self-employed','working hours','minimum wage','unemployment benefits','housing','unemployed']\n  if (hashtaglength>0){\n    for(i=0;i<hashtaglength;i++){\n      var hashtagtext=hashtaginfo[i].text\n      var lhashtagtext=hashtagtext.toLowerCase()\n      hasht.push(lhashtagtext)\n    }\n    \n  }\n  var hatext=hasht.join(',')\n  var employhashresults=employterms.map(checkhashtagemploy)\n   function checkhashtagemploy(value,index,array){\n    re=hatext.search(value)\n    return re\n  }\n  var emphashlen=employhashresults.length\n  if (emphashlen>0){\n    for(i=0;i<emphashlen;i++){\n      if (employhashresults[i]!=-1){\n     emit({'term':'employment','location':doc.place.name}, 1);\n     break\n    }\n    \n  }\n  \n  }\n \n}"
+    }
+  },
+  "language": "javascript"
+}
+
+# Create your header as required
+hes = {"content-type": "application/json" }
+#url=http://username:passwordipaddress/databasename/_design/designdocumentname
+ur='http://user:pass@localhost:5984/final_tweet_harvester2/_design/final'
+resty=requests.put(ur,json=payload,headers=hes)
+str_result=str(resty)
+inter_res=str_result[1:-1]
+if inter_res=='Response [201]':
+    print('success....!')
+    print('design document created')
+else:
+    print(resty)
 class liveTweets(StreamListener):
     def on_data(self,data):
         global tweet_tracker

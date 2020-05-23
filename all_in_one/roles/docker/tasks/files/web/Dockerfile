@@ -3,4 +3,5 @@ RUN apt-get update && apt-get install -y \
         python3-pip
 RUN pip install wheel
 RUN pip install requests
+RUN pip install Flask
 COPY ./app /app
