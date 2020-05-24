@@ -13,6 +13,10 @@ url_hash_employment='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_des
 url_location='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/location?reduce=true&group=true'
 url_precise='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/precise?reduce=true&group=true'
 
+loc_list = ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide',
+'Gold Coast', 'Canberra', 'Newcastle', 'Wollongong', 'Logan City', 'Geelong', 'Hobart', 'Townsville',
+'Cairns', 'Toowoomba', 'Darwin', 'Rockingham', 'Launceston', 'Bendigo', 'Ballarat', 'Mandurah', 'Mackay',
+'Bundaberg', 'Bunbury', 'Maitland', 'Armadale', 'Rockhampton','Adelaide Hills', 'South Brisbane', 'Hervey Bay']
 @app.errorhandler(400)
 def not_found(error):
     return make_response(jsonify( { 'error': 'Bad request' } ), 400)
@@ -21,22 +25,17 @@ def not_found(error):
 def not_found(error):
     return make_response(jsonify( { 'error': 'Not found' } ), 404)
 
-#datas = {"rows":[{"key":{"term":"covid","location":"melbourne"},"value": 1050 },
-   # {"key":{"term":"economy","location":"sydney"},"value": 1100 }]}
-
-#loc_data = {"rows":[{"key":{"location name":"10 savy road","location coordinates":[[[10.2,12.3],[14,13.9],[14.5,16.7],[18.9,20.1]]]},"value": 1050 },
-   # {"key":{"location name":"10 portmelb road","location coordinates":[[[10.2,12.3],[14,13.9],[14.5,16.7],[18.9,20.1]]]},"value": 1200 }]}
-
 def get_info(data):
     full_list = []
     info_list = data["rows"]
     for ind_info in info_list:
         info_dict = {}
         key_dict = ind_info["key"]
-        info_dict["term"] = key_dict["term"]
-        info_dict["location"] = key_dict["location"]
-        info_dict["count"] = ind_info["value"]
-        full_list.append(info_dict)
+        if key_dict["location"] in loc_list:
+            info_dict["term"] = key_dict["term"]
+            info_dict["location"] = key_dict["location"]
+            info_dict["count"] = ind_info["value"]
+            full_list.append(info_dict)
     return full_list
 
 def get_loc(data):
@@ -45,10 +44,11 @@ def get_loc(data):
     for ind_info in info_list:
         info_dict = {}
         key_dict = ind_info["key"]
-        info_dict["location name"] = key_dict["location name"]
-        info_dict["location coordinates"] = key_dict["location coordinates"][0]
-        info_dict["count"] = ind_info["value"]
-        full_list.append(info_dict)
+        if key_dict["location name"] in loc_list:
+            info_dict["location name"] = key_dict["location name"]
+            info_dict["location coordinates"] = key_dict["location coordinates"][0]
+            info_dict["count"] = ind_info["value"]
+            full_list.append(info_dict)
     return full_list
 
 def get_loc_precise(data):
@@ -95,9 +95,5 @@ def get_tasks7():
 def get_tasks8():
     return jsonify(list(get_loc_precise(requests.get(url_precise).json())))
 
-@app.route("/")
-def hello():
-    return "Hello World"
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=80)
+    app.run(debug = True, host = '0.0.0.0', port = 8080)
