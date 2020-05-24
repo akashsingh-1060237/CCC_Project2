@@ -9,22 +9,28 @@
 - name: check directory exists
   become: yes
   stat:
-    path: '/docker/react/my-app'
+    path: '/docker/react/{{ APP_NAME }}'
   register: dir_to_delete
 
 # delete directory if condition is true
-- name: purge my-app
+- name: purge react app folder
   become: yes
   file:
     state: absent
-    path: '/docker/react/my-app'
+    path: '/docker/react/{{ APP_NAME }}'
   when: dir_to_delete.stat.exists and dir_to_delete.stat.isdir
 
-- name: Create react app
+#- name: Create react app
+#  become: yes
+#  args:
+#    chdir: '/docker/react'
+#  command: 'yarn create react-app {{ APP_NAME }}'
+
+- name: Clone from git
   become: yes
   args:
     chdir: '/docker/react'
-  command: 'yarn create react-app {{ APP_NAME }}'
+  command: 'git clone {{ GIT_REPO }}'
 
 - name: Copy Dockerfile into react app
   become: yes
