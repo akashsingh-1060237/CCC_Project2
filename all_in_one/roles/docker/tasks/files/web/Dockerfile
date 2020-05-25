@@ -4,4 +4,5 @@ RUN apt-get update && apt-get install -y \
 RUN pip install wheel
 RUN pip install requests
 RUN pip install Flask
+RUN pip install -U flask-cors
 COPY ./app /app

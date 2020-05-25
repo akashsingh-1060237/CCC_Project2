@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, abort, make_response
 import requests
-import os
+from flask_cors import CORS
+# import os
 # os.environ["HTTPS_PROXY"] = "http://wwwproxy.unimelb.edu.au:8000"
-# app = Flask(__name__)
+app = Flask(__name__)
+CORS(app)
 urlfrmat='http://ip/dt'
 url_corona='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/corona?reduce=true&group=true'
 url_economy='http://user:pass@127.0.0.1:5984/final_tweet_harvester2/_design/final/_view/economy?reduce=true&group=true'
@@ -17,6 +19,7 @@ loc_list = ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide',
 'Gold Coast', 'Canberra', 'Newcastle', 'Wollongong', 'Logan City', 'Geelong', 'Hobart', 'Townsville',
 'Cairns', 'Toowoomba', 'Darwin', 'Rockingham', 'Launceston', 'Bendigo', 'Ballarat', 'Mandurah', 'Mackay',
 'Bundaberg', 'Bunbury', 'Maitland', 'Armadale', 'Rockhampton','Adelaide Hills', 'South Brisbane', 'Hervey Bay']
+
 @app.errorhandler(400)
 def not_found(error):
     return make_response(jsonify( { 'error': 'Bad request' } ), 400)
@@ -65,7 +68,9 @@ def get_loc_precise(data):
 
 @app.route('/fetch/api/v1.0/tasks/corona', methods = ['GET'])
 def get_tasks1():
-    return jsonify(list(get_info(requests.get(url_corona).json())))
+    response = jsonify(list(get_info(requests.get(url_corona).json())))
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route('/fetch/api/v1.0/tasks/economy', methods = ['GET'])
 def get_tasks2():
@@ -96,4 +101,4 @@ def get_tasks8():
     return jsonify(list(get_loc_precise(requests.get(url_precise).json())))
 
 if __name__ == '__main__':
-    app.run(debug = True, host = '0.0.0.0', port = 8080)
+    app.run(debug = True, host = '0.0.0.0', port = 80)

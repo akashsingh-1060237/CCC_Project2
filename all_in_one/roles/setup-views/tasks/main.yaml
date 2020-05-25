@@ -10,5 +10,4 @@
   command: 'python3 /docker/harvest/setup_views.py'
 
 - pause:
-    prompt: "Enter a secret"
-    echo: no
+    seconds: 5

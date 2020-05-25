@@ -1,13 +1,26 @@
 FROM node:12 AS builder
-WORKDIR /app
+#WORKDIR /app
 COPY . .
-RUN yarn run build
+RUN yarn config set proxy http://wwwproxy.unimelb.edu.au:8000
+RUN yarn config set https-proxy http://wwwproxy.unimelb.edu.au:8000
+RUN yarn install
+#RUN yarn build
 
 
 FROM node:12
 RUN yarn config set proxy http://wwwproxy.unimelb.edu.au:8000
 RUN yarn config set https-proxy http://wwwproxy.unimelb.edu.au:8000
-RUN yarn global add serve
+#RUN yarn global add serve
+#WORKDIR /app
+#COPY --from=builder /app/build .
+#CMD ["serve", "-p", "3000", "-s", "."]
+CMD ['yarn start']
+
+
+FROM node:12
 WORKDIR /app
-COPY --from=builder /app/build .
-CMD ["serve", "-p", "3000", "-s", "."]
+COPY . .
+RUN yarn config set proxy http://wwwproxy.unimelb.edu.au:8000
+RUN yarn config set https-proxy http://wwwproxy.unimelb.edu.au:8000
+RUN yarn install
+CMD yarn start

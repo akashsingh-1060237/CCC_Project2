@@ -1,6 +1,8 @@
 version: '3'
 services:
   react:
+    stdin_open: true
+    tty: true
     image: myreact:latest
     restart: always
     volumes:
