@@ -1,7 +1,7 @@
 ---
 - name: Deploy react from a compose file
   become: yes
-  command: 'docker service create --name myreact --replicas 2 --network="host" --publish mode=host,target=3000,published=3000 myreact'
+  command: 'docker service create --name myreact --tty --replicas 2 --network="host" --publish mode=host,target=3000,published=3000 myreact'
 
 #  docker_stack:
 #    state: present
