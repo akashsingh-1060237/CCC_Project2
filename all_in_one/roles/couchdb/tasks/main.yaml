@@ -1,0 +1,54 @@
+---
+- name: Install couchdb
+  become: yes
+  shell: 'docker pull {{ couchdb }}:{{ couchdb_version }}'
+
+- name: Run couchdb
+  become: yes
+  shell: 'docker run --name couchdb{{ ansible_default_ipv4.address }} -v couchdb:/opt/couchdb/data -it -p 9100-9200:9100-9200 -p 5984:5984 -p 4369:4369 --env COUCHDB_USER={{ user }} --env COUCHDB_PASSWORD={{ password }} --env NOOENAME="couchdb@{{ ansible_default_ipv4.address }}" --env COUCHDB_SECRET={{COUCHDB_SECRET}} --env ERL_FLAGS="-setcookie {{COUCHDB_SECRET}} -name couchdb@{{ ansible_default_ipv4.address }}" -d {{ couchdb }}:{{ couchdb_version }}'
+
+- pause:
+    seconds: 5
+
+- name: Set facts
+  set_fact:
+    num: '{{ groups["COMP90024"] | length }}'
+
+- name: Enable the couchdb cluster
+  become: yes
+  shell: "curl -X POST -H \"Content-Type: application/json\" http://{{ user }}:{{ password }}@{{ ansible_default_ipv4.address }}:5984/_cluster_setup -d '{\"action\": \"enable_cluster\", \"bind_address\": \"0.0.0.0\", \"username\": \"{{ user }}\", \"password\":\"{{ password }}\", \"port\": 5984, \"node_count\": \"{{ num }}\", \"remote_node\": \"{{ item }}\", \"remote_current_user\": \"{{ user }}\", \"remote_current_password\": \"{{ password }}\" }'"
+  loop: '{{ groups["workers"] }}'
+
+- pause:
+    seconds: 1
+
+- name: Join the couchdb cluster
+  become: yes
+  shell: "curl -X POST -H \"Content-Type: application/json\" http://{{ user }}:{{ password }}@{{ ansible_default_ipv4.address }}:5984/_cluster_setup -d '{\"action\": \"add_node\", \"host\":\"{{ item }}\", \"port\": 5984, \"username\": \"{{ user }}\", \"password\":\"{{ password }}\"}'"
+  loop: '{{ groups["workers"] }}'
+
+- pause:
+    seconds: 1
+
+- name: Need this line to fix finish cluster bugs
+  become: yes
+  shell: "curl http://{{ user }}:{{ password }}@{{ ansible_default_ipv4.address }}:5984/"
+
+- pause:
+    seconds: 1
+
+- name: Finish building the cluster
+  become: yes
+  shell: "curl -X POST -H \"Content-Type: application/json\" http://{{ user }}:{{ password }}@{{ ansible_default_ipv4.address }}:5984/_cluster_setup -d '{\"action\": \"finish_cluster\"}'"
+
+- pause:
+    seconds: 1
+
+- name: Verification
+  become: yes
+  shell: "curl http://{{ user }}:{{ password }}@{{ ansible_default_ipv4.address }}:5984/_membership"
+
+
+
+
+

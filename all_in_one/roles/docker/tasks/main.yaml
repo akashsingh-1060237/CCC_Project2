@@ -1,0 +1,143 @@
+---
+- name: Uninstall old versions of docker
+  tags: 'docker'
+  become: yes
+  apt:
+    name: ['docker', 'docker-engine', 'docker.io']
+    state: absent
+
+- name: Install dependencies
+  tags: 'docker'
+  become: yes
+  apt:
+    name: ['apt-transport-https', 'ca-certificates', 'curl', 'python-setuptools', 'software-properties-common']
+    state: latest
+    install_recommends: no
+    update_cache: yes
+
+- name: Add Docker apt repository key
+  tags: 'docker'
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker apt repository and update apt cache
+  tags: 'docker'
+  become: yes
+  apt_repository:
+    repo: "deb https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+    mode: '644'
+    update_cache: yes
+    state: present
+
+- name: Install docker
+  tags: 'docker'
+  become: yes
+  apt:
+    name: ['docker-ce']
+    state: latest
+    install_recommends: no
+    update_cache: yes
+
+- name: Install docker-compose
+  tags: 'docker'
+  become: yes
+  pip:
+    name: ['docker-compose']
+    state: latest
+
+- name: Ensure service is enabled
+  service: name=docker state=started
+
+# set http proxy
+- name: Set http proxy
+  copy:
+    src: "./files/http-proxy.conf"
+    dest: "/etc/systemd/system/docker.service.d/"
+    mode: '0644'
+    owner: root
+    group: root
+  become: true
+  tags: testing
+
+# set docker proxy
+- name: Set docker proxy
+  copy:
+    src: "./files/config.json"
+    dest: "/.docker/"
+    mode: '0644'
+    owner: root
+    group: root
+  become: true
+  tags: testing
+
+# copy dockerfile
+- name: Copying file to remote
+  become: yes
+  copy:
+    src: "./docker"
+    dest: "/"
+
+# reboot machine to load new settings
+- name: Reboot a machine
+  become: yes
+  reboot:
+    reboot_timeout: 3000
+#
+## build Nginx image
+#- name: Build Docker image from Dockerfile
+#  become: yes
+#  docker_image:
+#    name: web-server
+#    build:
+#      pull: yes
+#      path: "/docker"
+#    source: build
+
+- name: Get running containers
+  become: yes
+  docker_host_info:
+    containers: yes
+  register: docker_info
+
+- name: Stop running containers
+  become: yes
+  docker_container:
+    name: "{{ item }}"
+    state: stopped
+  loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
+
+# delete all stopped container and volumes
+- name: Prune everything
+  become: yes
+  docker_prune:
+    containers: yes
+
+# copy file and build flask-nginx server image
+- name: Copying file to remote
+  become: yes
+  copy:
+    src: "./files/docker-compose.yaml"
+    dest: "/docker"
+
+- name: Copy web configuration files
+  become: yes
+  copy:
+    src: './files/web'
+    dest: '/docker'
+
+- name: Build web image from Dockerfile
+  become: yes
+  command: 'docker build -t web-server --build-arg http_proxy=http://wwwproxy.unimelb.edu.au:8000/ --build-arg https_proxy=http://wwwproxy.unimelb.edu.au:8000/ .'
+  args:
+    chdir: '/docker/web'
+#  docker_image:
+#    name: web-server
+#    build:
+#      pull: yes
+#      path: "/docker/web"
+#    source: build
+#  environment:
+#    http_proxy: http://wwwproxy.unimelb.edu.au:8000/
+#    https_proxy: http://wwwproxy.unimelb.edu.au:8000/

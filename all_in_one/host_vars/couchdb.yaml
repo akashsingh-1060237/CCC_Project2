@@ -1,0 +1,8 @@
+# couch db version
+couchdb: 'ibmcom/couchdb3'
+couchdb_version: '3.0.0'
+
+# user and pass
+user: 'user'
+password: 'pass'
+COUCHDB_SECRET: a192aeb9904e6590849337933b000c99

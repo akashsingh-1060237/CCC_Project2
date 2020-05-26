@@ -1,0 +1,48 @@
+---
+- name: Copy compose file into react folder
+  become: yes
+  copy:
+    src: './files/docker-compose.yaml'
+    dest: '/docker/react/'
+
+# collect stats about the dir
+- name: check directory exists
+  become: yes
+  stat:
+    path: '/docker/react/{{ APP_NAME }}'
+  register: dir_to_delete
+
+# delete directory if condition is true
+- name: purge react app folder
+  become: yes
+  file:
+    state: absent
+    path: '/docker/react/{{ APP_NAME }}'
+  when: dir_to_delete.stat.exists and dir_to_delete.stat.isdir
+
+#- name: Create react app
+#  become: yes
+#  args:
+#    chdir: '/docker/react'
+#  command: 'yarn create react-app {{ APP_NAME }}'
+
+- name: Clone from git
+  become: yes
+  args:
+    chdir: '/docker/react'
+  command: 'git clone {{ GIT_REPO }}'
+
+- name: Copy Dockerfile into react app
+  become: yes
+  copy:
+    src: './files/Dockerfile'
+    dest: '/docker/react/{{ APP_NAME }}'
+
+- name: Build react image from Dockerfile
+  become: yes
+  docker_image:
+    name: myreact:latest
+    build:
+      pull: yes
+      path: "/docker/react/{{ APP_NAME }}"
+    source: build

@@ -1,0 +1,16 @@
+---
+- name: Deploy stack from a compose file
+  become: yes
+  command: 'docker service create --name myweb  --replicas 2 --network="host" --publish mode=host,target=80,published=80 web-server'
+  args:
+    chdir: '/docker/'
+
+#  docker_stack:
+#    state: present
+#    name: mystack
+#    compose:
+#      - "/docker/docker-compose.yaml"
+#  register: output
+#
+#- debug:
+#    msg: '{{ output }}'

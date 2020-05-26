@@ -1,0 +1,32 @@
+---
+# Create docker swarm
+- name: Init a new swarm with default parameters
+  become: yes
+  docker_swarm:
+    state: present
+  register: manager_info
+
+# Store manager ip and join token
+- name: Store tokens
+  set_fact:
+    manager_addrs: '{{ ansible_default_ipv4.address }}'
+    manager_token: '{{ manager_info.swarm_facts.JoinTokens.Manager }}'
+    worker_token: '{{ manager_info.swarm_facts.JoinTokens.Worker }}'
+
+- debug:
+    msg: "Manager ip is {{ manager_addrs }}"
+
+- debug:
+    msg: "Manager token is {{ manager_token }}"
+
+- debug:
+    msg: "Worker token is {{ worker_token }}"
+
+# Join as manager
+- name: Join as a manager
+  become: yes
+  docker_swarm:
+    advertise_addr: '{{ ansible_default_ipv4.address }}'
+    state: join
+    join_token: '{{ manager_token }}'
+    remote_addrs: ['{{ manager_addrs }}']

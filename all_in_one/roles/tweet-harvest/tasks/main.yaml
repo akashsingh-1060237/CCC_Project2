@@ -1,0 +1,30 @@
+---
+- name: Copy script file to remote hosts
+  become: yes
+  copy:
+    src: "./files/harvest.py"
+    dest: "/docker/harvest/"
+
+- name: Copy service file to remote hosts
+  become: yes
+  copy:
+    src: "./files/harvest.service"
+    dest: "/lib/systemd/system/"
+
+- name: Start the script as an ubuntu service
+  become: yes
+  command: "systemctl daemon-reload"
+  args:
+    chdir: '/lib/systemd/system/'
+
+- name: Start the script as an ubuntu service
+  become: yes
+  command: "systemctl enable harvest.service"
+  args:
+    chdir: '/lib/systemd/system/'
+
+- name: Start the script as an ubuntu service
+  become: yes
+  command: "systemctl start harvest.service"
+  args:
+    chdir: '/lib/systemd/system/'

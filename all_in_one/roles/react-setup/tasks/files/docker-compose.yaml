@@ -1,0 +1,16 @@
+version: '3'
+services:
+  react:
+    stdin_open: true
+    tty: true
+    image: myreact:latest
+    restart: always
+    volumes:
+      - react-data:/app
+    ports:
+      - 3000:3000
+    deploy:
+      mode: replicated
+      replicas: 2
+volumes:
+  react-data:

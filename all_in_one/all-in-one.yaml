@@ -1,0 +1,77 @@
+- hosts: localhost
+  vars_files:
+    - host_vars/nectar.yaml
+  gather_facts: true
+  roles:
+    - role: openstack-common
+    - role: openstack-volume
+    - role: openstack-security-group
+    - role: openstack-instance
+
+- hosts: COMP90024
+  vars_files:
+    - host_vars/docker.yaml
+  gather_facts: true
+  roles:
+    - role: common
+    - role: volumes
+    - role: docker
+
+# Create a docker swarm
+- hosts: managers
+  gather_facts: true
+  roles:
+    - role: docker-swarm
+
+# Add worker nodes
+- hosts: workers
+  gather_facts: true
+  roles:
+    - role: docker-swarm-workers
+
+# Download react
+- hosts: COMP90024
+  vars_files:
+    - host_vars/react.yaml
+  gather_facts: true
+  roles:
+    - role: react-setup
+
+# react manager start react services
+- hosts: managers
+  gather_facts: true
+  roles:
+    - role: react-frontend
+
+# Worker nodes start
+- hosts: workers
+  vars_files:
+    - host_vars/couchdb.yaml
+  gather_facts: true
+  roles:
+    - role: couchdb-workers
+
+# The manager node run couchdb
+- hosts: managers
+  vars_files:
+    - host_vars/couchdb.yaml
+  gather_facts: true
+  roles:
+    - role: couchdb
+
+# create db views
+- hosts: COMP90024
+  gather_facts: true
+  roles:
+    - role: setup-views
+
+# Create web service
+- hosts: managers
+  gather_facts: true
+  roles:
+    - role: docker-services
+
+- hosts: COMP90024
+  gather_facts: true
+  roles:
+    - role: tweet-harvest

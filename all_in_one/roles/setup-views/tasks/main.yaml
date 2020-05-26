@@ -1,0 +1,13 @@
+---
+- name: Copy script file to remote hosts
+  become: yes
+  copy:
+    src: "./files/setup_views.py"
+    dest: "/docker/harvest/"
+
+- name: Setup views
+  become: yes
+  command: 'python3 /docker/harvest/setup_views.py'
+
+- pause:
+    seconds: 5

@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  flask:
+    image: web-server
+    container_name: web
+    restart: always
+    volumes:
+      - web-data:/app
+    ports:
+      - 80:80
+    deploy:
+      mode: replicated
+      replicas: 2
+    networks:
+      - 'outside'
+
+networks:
+  outside:
+    external:
+      name: 'host'
+
+volumes:
+  web-data:
+
